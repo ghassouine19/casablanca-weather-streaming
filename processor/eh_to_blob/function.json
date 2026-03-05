@@ -1,0 +1,20 @@
+{
+  "scriptFile": "__init__.py",
+  "bindings": [
+    {
+      "type": "eventHubTrigger",
+      "direction": "in",
+      "name": "event",
+      "eventHubName": "weather",
+      "connection": "EVENTHUB_LISTEN_CONNECTION",
+      "consumerGroup": "$Default"
+    },
+    {
+      "type": "signalR",
+      "direction": "out",
+      "name": "signalRMessages",
+      "hubName": "weather",
+      "connectionStringSetting": "AzureSignalRConnectionString"
+    }
+  ]
+}
