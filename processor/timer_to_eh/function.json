@@ -1,0 +1,18 @@
+{
+  "scriptFile": "__init__.py",
+  "bindings": [
+    {
+      "name": "mytimer",
+      "type": "timerTrigger",
+      "direction": "in",
+      "schedule": "*/60 * * * * *"
+    },
+    {
+      "name": "event",
+      "type": "eventHub",
+      "direction": "out",
+      "eventHubName": "weather",
+      "connection": "EVENTHUB_SEND_CONNECTION"
+    }
+  ]
+}

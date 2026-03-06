@@ -15,7 +15,7 @@ def _build_blob_name(payload: dict) -> str:
     return f"bronze/weather/city={city}/year={now:%Y}/month={now:%m}/day={now:%d}/{ts_safe}.json"
 
 
-def main(event: func.EventHubEvent, signalRMessages: func.Out[func.SignalRMessage]):
+def main(event: func.EventHubEvent, signalRMessages: func.Out[str]):
     raw = event.get_body().decode("utf-8")
     payload = json.loads(raw)
 
@@ -31,9 +31,11 @@ def main(event: func.EventHubEvent, signalRMessages: func.Out[func.SignalRMessag
 
     logging.info("Stored blob: %s", blob_name)
 
-    # Broadcast to SignalR
-    msg = func.SignalRMessage(
-        target="weatherUpdate",
-        arguments=[payload]
-    )
-    signalRMessages.set(msg)
+    # Broadcast to SignalR (binding-friendly)
+    messages = [
+        {
+            "target": "weatherUpdate",
+            "arguments": [payload]
+        }
+    ]
+    signalRMessages.set(json.dumps(messages))
