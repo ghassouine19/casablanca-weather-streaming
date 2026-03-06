@@ -3,160 +3,100 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <title>Casablanca Weather • Live Dashboard</title>
-    <meta name="description" content="Live weather dashboard (Event Hubs → Functions → SignalR)." />
+    <title>Casablanca Météo • Live</title>
+    <meta name="description" content="Météo en direct à Casablanca (Event Hubs → Functions → SignalR)." />
     <link rel="stylesheet" href="styles.css" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/7.0.14/signalr.min.js" defer></script>
     <script src="app.js" defer></script>
   </head>
 
   <body>
-    <div class="bg"></div>
+    <div class="sky-bg"></div>
 
-    <header class="topbar">
-      <div class="topbar__inner">
-        <div class="brand">
-          <div class="brand__title">Casablanca Weather</div>
-          <div class="brand__subtitle">Event Hubs → Azure Functions → SignalR</div>
+    <main class="weather-app">
+
+      <!-- ── HERO ── -->
+      <section class="hero">
+        <div class="hero__location">
+          <span class="hero__pin">📍</span>
+          <span id="heroCity">Casablanca</span>
         </div>
+        <div id="heroTemp" class="hero__temp">—</div>
+        <div id="heroDesc" class="hero__desc">—</div>
+        <div id="heroFeelsLike" class="hero__feels">Ressenti : —</div>
+        <div id="heroHighLow" class="hero__highlow">↑ — &nbsp; ↓ —</div>
 
-        <div class="pill pill--live" title="Realtime updates">
-          <span class="dot"></span>
-          LIVE
-        </div>
-      </div>
-    </header>
-
-    <main class="wrap">
-      <section class="panel">
-        <div class="panel__header">
-          <div class="panel__title">Overview</div>
-
-          <div class="panel__meta">
-            <div class="meta">
-              <div class="meta__label">Status</div>
-              <div id="status" class="status status--disconnected">Disconnected</div>
-            </div>
-
-            <div class="meta right">
-              <div class="meta__label">Last update</div>
-              <div class="meta__value">
-                <div id="lastUpdateHuman" class="strong">—</div>
-                <div id="lastUpdate" class="mono muted small">—</div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div class="divider"></div>
-
-        <div class="kpis">
-          <article class="kpi">
-            <div class="kpi__icon" aria-hidden="true">
-              <!-- Thermometer -->
-              <svg viewBox="0 0 24 24" fill="none">
-                <path d="M14 14.76V5a2 2 0 0 0-4 0v9.76a3.5 3.5 0 1 0 4 0Z" stroke="currentColor" stroke-width="1.6" />
-                <path d="M12 16.2V7.4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" />
-              </svg>
-            </div>
-            <div class="kpi__body">
-              <div class="kpi__label">Temperature</div>
-              <div id="temp" class="kpi__value">—</div>
-              <div class="kpi__hint muted">°C</div>
-            </div>
-          </article>
-
-          <article class="kpi">
-            <div class="kpi__icon" aria-hidden="true">
-              <!-- Droplet -->
-              <svg viewBox="0 0 24 24" fill="none">
-                <path d="M12 2s6 7 6 12a6 6 0 0 1-12 0c0-5 6-12 6-12Z" stroke="currentColor" stroke-width="1.6" />
-              </svg>
-            </div>
-            <div class="kpi__body">
-              <div class="kpi__label">Humidity</div>
-              <div id="humidity" class="kpi__value">—</div>
-              <div class="kpi__hint muted">% RH</div>
-            </div>
-          </article>
-
-          <article class="kpi">
-            <div class="kpi__icon" aria-hidden="true">
-              <!-- Wind -->
-              <svg viewBox="0 0 24 24" fill="none">
-                <path d="M3 8h11a3 3 0 1 0-3-3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" />
-                <path d="M3 12h15a3 3 0 1 1-3 3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" />
-                <path d="M3 16h8" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" />
-              </svg>
-            </div>
-            <div class="kpi__body">
-              <div class="kpi__label">Wind</div>
-              <div id="wind" class="kpi__value">—</div>
-              <div class="kpi__hint muted">km/h</div>
-            </div>
-          </article>
-
-          <article class="kpi">
-            <div class="kpi__icon kpi__icon--rain" aria-hidden="true">
-              <!-- Cloud rain -->
-              <svg viewBox="0 0 24 24" fill="none">
-                <path d="M7 18h10a4 4 0 0 0 .8-7.92A6 6 0 0 0 6.2 11.5 3.5 3.5 0 0 0 7 18Z" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" />
-                <path d="M9 20l-.5 2" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" />
-                <path d="M12 20l-.5 2" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" />
-                <path d="M15 20l-.5 2" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" />
-              </svg>
-            </div>
-            <div class="kpi__body">
-              <div class="kpi__label">Precipitation</div>
-              <div id="precip" class="kpi__value">—</div>
-              <div class="kpi__hint muted"><span id="precipPct">—</span></div>
-            </div>
-          </article>
-        </div>
-
-        <div class="grid2">
-          <div class="info">
-            <div class="info__label">City</div>
-            <div id="city" class="info__value">—</div>
-          </div>
-          <div class="info">
-            <div class="info__label">Source</div>
-            <div id="source" class="info__value">—</div>
-          </div>
-          <div class="info">
-            <div class="info__label">Schema</div>
-            <div id="schema" class="info__value mono">—</div>
-          </div>
-          <div class="info">
-            <div class="info__label">Notes</div>
-            <div id="note" class="info__value muted">—</div>
-          </div>
+        <div class="hero__status-row">
+          <div class="pill pill--live"><span class="dot"></span>LIVE</div>
+          <div id="status" class="status status--disconnected">Déconnecté</div>
+          <span id="lastUpdateHuman" class="muted small">—</span>
+          <span id="lastUpdate" class="hidden">—</span>
         </div>
       </section>
 
-      <section class="panel">
-        <div class="panel__header">
-          <div>
-            <div class="panel__title">Activity</div>
-            <div class="muted small">Connection events & incoming messages.</div>
-          </div>
+      <!-- ── HOURLY FORECAST ── -->
+      <section class="card" id="hourlyCard">
+        <p id="forecastDesc" class="forecast-desc">—</p>
+        <div class="card-divider"></div>
+        <div class="hourly-scroll">
+          <div id="hourlyRow" class="hourly-row"></div>
+        </div>
+      </section>
 
-          <div class="panel__actions">
-            <button id="toggleLogs" class="btn btn--ghost" type="button">Hide logs</button>
-            <button id="clear" class="btn" type="button">Clear</button>
+      <!-- ── 7-DAY FORECAST ── -->
+      <section class="card" id="dailyCard">
+        <div class="card-section-title">📅 PRÉVISIONS SUR 7 JOURS</div>
+        <div class="card-divider"></div>
+        <div id="dailyList" class="daily-list"></div>
+      </section>
+
+      <!-- ── DETAILS ── -->
+      <div class="details-grid">
+        <div class="detail-card">
+          <div class="detail-title">💧 HUMIDITÉ</div>
+          <div id="humidity" class="detail-value">—</div>
+          <div class="detail-unit">%</div>
+        </div>
+        <div class="detail-card">
+          <div class="detail-title">💨 VENT</div>
+          <div id="wind" class="detail-value">—</div>
+          <div class="detail-unit">km/h</div>
+        </div>
+        <div class="detail-card">
+          <div class="detail-title">🌧️ PRÉCIP.</div>
+          <div id="precip" class="detail-value">—</div>
+          <div id="precipPct" class="detail-unit">—</div>
+        </div>
+        <div class="detail-card">
+          <div class="detail-title">🔵 PRESSION</div>
+          <div id="pressure" class="detail-value">—</div>
+          <div class="detail-unit">hPa</div>
+        </div>
+      </div>
+
+      <!-- ── ACTIVITY LOG ── -->
+      <section class="card log-section">
+        <div class="log-header">
+          <div>
+            <span class="card-section-title" style="display:inline-block;padding:0">⚡ ACTIVITÉ</span>
+            <span class="muted small" style="margin-left:8px">
+              Source: <span id="source">—</span> · Schema: <span id="schema" class="mono">—</span>
+            </span>
+          </div>
+          <div class="log-actions">
+            <button id="toggleLogs" class="btn btn--ghost" type="button">Afficher</button>
+            <button id="clear" class="btn" type="button">Effacer</button>
           </div>
         </div>
-
-        <div class="divider"></div>
-
-        <pre id="log" class="log"></pre>
+        <pre id="log" class="log" style="display:none"></pre>
       </section>
 
       <footer class="footer muted small">
-        <span>Azure Static Website.</span>
-        <span class="dotsep">•</span>
+        <span>Azure Static Website · Event Hubs → Functions → SignalR</span>
+        <span class="dotsep">·</span>
         <span id="buildInfo" class="mono"></span>
       </footer>
+
     </main>
   </body>
 </html>
