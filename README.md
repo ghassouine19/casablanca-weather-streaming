@@ -298,7 +298,7 @@ This project is provided **for educational and demonstration purposes**.
 
 **Abderrahmane Ghassouine**
 
-Big data and Cloud Computing Student
+Big data and Cloud Computing Master's Student
 
 GitHub  
 https://github.com/ghassouine19
