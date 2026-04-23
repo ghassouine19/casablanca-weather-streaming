@@ -1,4 +1,4 @@
-# 🌦️ Casablanca Weather Streaming
+ # 🌦️ Casablanca Weather Streaming
 
 **Real-time weather dashboard for Casablanca powered by an Azure streaming data pipeline.**
 
